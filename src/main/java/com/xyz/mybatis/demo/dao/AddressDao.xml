@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xyz.mybatis.demo.dao.AddressDao">
+
+  <select id="load" resultType="Address">
+    select * from app_address b
+  </select>
+
+  <update id="update" parameterType="Address">
+    update app_address b set b.count = b.count+1
+  </update>
+
+</mapper>

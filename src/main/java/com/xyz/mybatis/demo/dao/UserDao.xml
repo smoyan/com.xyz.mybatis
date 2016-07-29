@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xyz.mybatis.demo.dao.UserDao">
+
+  <select id="load" resultType="User">
+    select * from app_user b
+  </select>
+
+  <update id="update" parameterType="User">
+    update app_user b set b.age = b.age+1
+  </update>
+
+</mapper>
