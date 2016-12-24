@@ -13,8 +13,12 @@ import java.util.List;
  */
 public interface UserService {
 
-  public List<User> load();
+  public User load(int id);
+
+  public List<User> loadAll();
 
   public int update(User user);
+
+  public List<User> select();
 
 }

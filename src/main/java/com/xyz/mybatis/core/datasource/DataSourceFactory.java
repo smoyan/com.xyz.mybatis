@@ -28,7 +28,11 @@ public class DataSourceFactory implements org.apache.ibatis.datasource.DataSourc
       for (Field item : fields) {
         item.setAccessible(true);
         if (props.containsKey(item.getName())) {
-          item.set(dataSource, props.get(item.getName()));
+          if (item.getGenericType().toString().equals("int")) {
+            item.set(dataSource, Integer.parseInt(props.getProperty(item.getName())));
+          } else {
+            item.set(dataSource, props.get(item.getName()));
+          }
         }
       }
     } catch (IllegalArgumentException | IllegalAccessException e) {

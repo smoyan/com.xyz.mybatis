@@ -31,6 +31,7 @@ public class ConnectionHolder {
   }
 
   public SqlSession getSession() {
+    System.out.println("session : " + session);
     return session;
   }
 

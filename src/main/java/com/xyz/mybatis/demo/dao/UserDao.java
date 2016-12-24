@@ -4,17 +4,20 @@
 
 package com.xyz.mybatis.demo.dao;
 
-
-import com.xyz.mybatis.model.User;
-
 import java.util.List;
+
+import com.xyz.mybatis.core.annotation.Repository;
+import com.xyz.mybatis.model.User;
 
 /**
  * @author lee.
  */
+@Repository
 public interface UserDao {
 
-  public List<User> load();
+  public User load(int id);
+
+  public List<User> loadAll();
 
   public int update(User user);
 }

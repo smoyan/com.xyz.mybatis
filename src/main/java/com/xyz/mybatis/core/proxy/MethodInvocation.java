@@ -1,13 +1,13 @@
 package com.xyz.mybatis.core.proxy;
 
-import com.xyz.mybatis.core.annotation.AnnotationUtils;
-import com.xyz.mybatis.core.annotation.Transactional;
-import com.xyz.mybatis.core.base.Service;
-import com.xyz.mybatis.core.session.ConnectionHolder;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+
+import com.xyz.mybatis.core.annotation.AnnotationUtils;
+import com.xyz.mybatis.core.annotation.Transactional;
+import com.xyz.mybatis.core.session.ConnectionHolder;
+import com.xyz.mybatis.core.session.SessionFactoryBean;
 
 public class MethodInvocation<T> implements InvocationHandler {
 
@@ -40,7 +40,7 @@ public class MethodInvocation<T> implements InvocationHandler {
       isAutoCommit = false;
       isInTransactional = true;
     }
-    conHolder = ((Service) target).getConnectionHolder(isAutoCommit);
+    conHolder = SessionFactoryBean.getSessionLocal(isAutoCommit).get();
   }
 
   /**
@@ -49,10 +49,11 @@ public class MethodInvocation<T> implements InvocationHandler {
   private void afterInvoke(Method method) {
     System.out.println("after method : " + method.getName());
     if (isInTransactional) {
+      System.out.println("commit transaction ");
       conHolder.getSession().commit(true);
       conHolder.setDirty(true);
       conHolder.getSession().close();
-      // ((Service) target).clearSession();
+      SessionFactoryBean.getSessionLocal().remove();
     }
   }
 

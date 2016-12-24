@@ -13,6 +13,8 @@ public class Address {
   private String address;
   private int count;
 
+  private int userId;
+
   public int getId() {
     return id;
   }
@@ -35,6 +37,20 @@ public class Address {
 
   public void setCount(int count) {
     this.count = count;
+  }
+
+  /**
+   * @return the userId
+   */
+  public int getUserId() {
+    return userId;
+  }
+
+  /**
+   * @param userId the userId to set
+   */
+  public void setUserId(int userId) {
+    this.userId = userId;
   }
 
 }

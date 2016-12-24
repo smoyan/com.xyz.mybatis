@@ -1,5 +1,7 @@
 package com.xyz.mybatis.model;
 
+import java.util.List;
+
 /**
  * @author lee.
  */
@@ -9,6 +11,8 @@ public class User {
   private String username;
   private String sex;
   private String age;
+
+  List<Address> addresses;
 
   public String getAge() {
     return age;
@@ -40,6 +44,20 @@ public class User {
 
   public void setSex(String sex) {
     this.sex = sex;
+  }
+
+  /**
+   * @return the addresses
+   */
+  public List<Address> getAddresses() {
+    return addresses;
+  }
+
+  /**
+   * @param addresses the addresses to set
+   */
+  public void setAddresses(List<Address> addresses) {
+    this.addresses = addresses;
   }
 
 }
