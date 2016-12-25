@@ -27,24 +27,27 @@ public class SessionFactoryBean {
   private static final String resource = "mybatis.xml";
   private static final String basepackage = "com.xyz.mybatis.demo.dao";
   private static final ConcurrentHashMap<Class<?>, Object> repositories = new ConcurrentHashMap<>();
+  private static final SessionFactoryBean intance = new SessionFactoryBean();
 
-  private static ThreadLocal<ConnectionHolder> sessionLocal = new ThreadLocal<ConnectionHolder>();
+  private static ThreadLocal<ConnectionHolder> sessionLocal;
 
-  static {
+  public SessionFactoryBean() {
     getSqlSessionFactory();
+    sessionLocal = new ThreadLocal<ConnectionHolder>();
   }
 
-  public static SqlSessionFactory getSqlSessionFactory() {
+  public SqlSessionFactory getSqlSessionFactory() {
     if (sqlSessionFactory == null) {
       synchronized (SessionFactoryBean.class) {
-        if (sqlSessionFactory == null)
+        if (sqlSessionFactory == null) {
           initSqlSessionFactory();
+        }
       }
     }
     return sqlSessionFactory;
   }
 
-  private static void initSqlSessionFactory() {
+  private void initSqlSessionFactory() {
     try {
       InputStream inputStream = Resources.getResourceAsStream(resource);
       sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
@@ -57,7 +60,7 @@ public class SessionFactoryBean {
   /**
    * @param basepackage
    */
-  private static void scan(String basepackage) {
+  private void scan(String basepackage) {
     try {
       Set<Class<?>> classes = DefaultClassScanner.getInstance().getClassListByAnnotation(basepackage, Repository.class);
       for (Class<?> item : classes) {
@@ -79,11 +82,17 @@ public class SessionFactoryBean {
     return getSessionLocal(true);
   }
 
-  public static ThreadLocal<ConnectionHolder> getSessionLocal(boolean isAutoCommit) {
+  public static ThreadLocal<ConnectionHolder> getSessionLocal(boolean autoCommit) {
     if (null == sessionLocal.get()) {
-      sessionLocal.set(new ConnectionHolder(getSqlSessionFactory().openSession(isAutoCommit)));
+      sessionLocal.set(new ConnectionHolder(getInstance().getSqlSessionFactory().openSession(autoCommit), autoCommit));
+    } else if (sessionLocal.get().getSession() == null) {
+      sessionLocal.get().setSession(getInstance().getSqlSessionFactory().openSession(autoCommit));
     }
     return sessionLocal;
+  }
+
+  public static SessionFactoryBean getInstance() {
+    return intance;
   }
 
 }

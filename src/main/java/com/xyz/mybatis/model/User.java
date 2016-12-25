@@ -10,15 +10,15 @@ public class User {
   private Integer id;
   private String username;
   private String sex;
-  private String age;
+  private int age;
 
   List<Address> addresses;
 
-  public String getAge() {
+  public int getAge() {
     return age;
   }
 
-  public void setAge(String age) {
+  public void setAge(int age) {
     this.age = age;
   }
 
@@ -54,10 +54,22 @@ public class User {
   }
 
   /**
-   * @param addresses the addresses to set
+   * @param addresses
+   *          the addresses to set
    */
   public void setAddresses(List<Address> addresses) {
     this.addresses = addresses;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "User [id=" + id + ", username=" + username + ", sex=" + sex + ", age=" + age + ", addresses=" + addresses
+        + "]";
   }
 
 }

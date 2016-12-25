@@ -15,7 +15,6 @@ import com.xyz.mybatis.core.session.SessionFactoryBean;
 public class MethodInvocation<T> implements InvocationHandler {
   private static final Logger logger = LoggerFactory.getLogger(MethodInvocation.class);
   private T target;
-  private ConnectionHolder conHolder;
   private boolean isInTransactional;
 
   public MethodInvocation(T target) {
@@ -24,9 +23,15 @@ public class MethodInvocation<T> implements InvocationHandler {
 
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    beforeInvoke(method);
-    Object result = method.invoke(target, args);
-    afterInvoke(method);
+    Object result = null;
+    try {
+      beforeInvoke(method);
+      result = method.invoke(target, args);
+      afterInvoke(method);
+    } catch (Exception err) {
+      SessionFactoryBean.getSessionLocal().get().getSession().rollback();
+      throw err;
+    }
     return result;
   }
 
@@ -43,7 +48,7 @@ public class MethodInvocation<T> implements InvocationHandler {
       isAutoCommit = false;
       isInTransactional = true;
     }
-    conHolder = SessionFactoryBean.getSessionLocal(isAutoCommit).get();
+    SessionFactoryBean.getSessionLocal(isAutoCommit).get();
   }
 
   /**
@@ -51,10 +56,11 @@ public class MethodInvocation<T> implements InvocationHandler {
    */
   private void afterInvoke(Method method) {
     if (isInTransactional) {
+      ConnectionHolder conHolder = SessionFactoryBean.getSessionLocal().get();
       conHolder.getSession().commit(true);
       conHolder.setDirty(true);
-      conHolder.getSession().close();
-      SessionFactoryBean.getSessionLocal().remove();
+      conHolder.close();
+      SessionFactoryBean.getSessionLocal().get().setSession(null);
     }
     logger.info("after invoke method : " + method.getName());
   }

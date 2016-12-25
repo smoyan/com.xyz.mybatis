@@ -4,9 +4,12 @@
 
 package com.xyz.mybatis;
 
-import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xyz.mybatis.core.proxy.ProxyFactory;
 import com.xyz.mybatis.demo.service.UserService;
@@ -17,34 +20,61 @@ import com.xyz.mybatis.model.User;
  * @author lee.
  */
 public class UserServiceImplTest {
+  private static final Logger logger = LoggerFactory.getLogger(UserServiceImplTest.class);
   UserService userService = ProxyFactory.createProxy(UserServiceImpl.class);
 
   @Test
   public void test() throws InterruptedException {
-    new Thread() {
-      @Override
-      public void run() {
-        userService.update(null);
-        System.out.println("第" + 1 + "次执行完毕");
-        List<User> users = userService.loadAll();
-        System.out.println("age: " + users.get(0).getAge());
-      }
-    }.start();
+    long start = System.currentTimeMillis();
+    int threadNum = 20;
 
-    new Thread() {
-      @Override
-      public void run() {
-        int id = 1;
-        User user = userService.load(id);
-        user.setAge(user.getAge() + 1);
-        userService.update(user);
-        System.out.println("第" + 2 + "次执行完毕");
-        user = userService.load(id);
-        System.out.println("age: " + user.getAge());
-      }
-    }.start();
+    final CountDownLatch countDownLatch = new CountDownLatch(threadNum);
+    final CyclicBarrier barrier = new CyclicBarrier(threadNum);
 
-    Thread.sleep(Integer.MAX_VALUE);
+    for (int i = 0; i < threadNum; i++) {
+      new TaskThread(countDownLatch, i, barrier).start();
+    }
+
+    countDownLatch.await();
+    System.out.println("耗时(ms):" + (System.currentTimeMillis() - start));
+  }
+
+  private final class TaskThread extends Thread {
+    private CountDownLatch countDownLatch;
+    private int num;
+    private CyclicBarrier barrier;
+
+    public TaskThread(CountDownLatch countDownLatch, int num, CyclicBarrier barrier) {
+      this.countDownLatch = countDownLatch;
+      this.num = num;
+      this.barrier = barrier;
+    }
+
+    @Override
+    public void run() {
+      try {
+        logger.info(getName() + " 已准备好!正在等待!");
+        barrier.await();
+        doRun();
+      } catch (Exception e) {
+        e.printStackTrace();
+      } finally {
+        countDownLatch.countDown();
+      }
+    }
+
+    /**
+     * 
+     */
+    private void doRun() throws Exception {
+      logger.info(getName() + "开始执行");
+      int id = 1;
+      User user = userService.load(id);
+      user.setAge(user.getAge() + 1);
+      userService.update(user);
+      user = userService.load(id);
+      logger.info(getName() + "第" + num + "次执行完毕, user : " + user);
+    }
   }
 
 }

@@ -47,10 +47,21 @@ public class Address {
   }
 
   /**
-   * @param userId the userId to set
+   * @param userId
+   *          the userId to set
    */
   public void setUserId(int userId) {
     this.userId = userId;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "Address [id=" + id + ", address=" + address + ", count=" + count + ", userId=" + userId + "]";
   }
 
 }

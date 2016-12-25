@@ -17,7 +17,6 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.slf4j.Logger;
 
 public class SqlSessionTemplate implements SqlSession {
 
@@ -34,8 +33,8 @@ public class SqlSessionTemplate implements SqlSession {
   public SqlSessionTemplate(SqlSessionFactory sqlSessionFactory, ExecutorType executorType) {
     this.sqlSessionFactory = sqlSessionFactory;
     this.executorType = executorType;
-    this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(SqlSessionFactory.class.getClassLoader(), new Class[] { SqlSession.class },
-        new SqlSessionInterceptor());
+    this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(SqlSessionFactory.class.getClassLoader(),
+        new Class[] { SqlSession.class }, new SqlSessionInterceptor());
   }
 
   public SqlSessionFactory getSqlSessionFactory() {
@@ -202,27 +201,23 @@ public class SqlSessionTemplate implements SqlSession {
   private class SqlSessionInterceptor implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-      SqlSession sqlSession = SessionFactoryBean.getSessionLocal().get().getSession();
-      System.out.println("invoke sqlSession : " + sqlSession);
+      ConnectionHolder connectionHolder = SessionFactoryBean.getSessionLocal().get();
+      connectionHolder.acquired();
       try {
-        Object result = method.invoke(sqlSession, args);
-        boolean isSqlSessionTransactional = false;
-        if (isSqlSessionTransactional) {
-          // force commit even on non-dirty sessions because some databases require
-          // a commit/rollback before calling close()
-          sqlSession.commit(true);
+        Object result = method.invoke(connectionHolder.getSession(), args);
+        if (connectionHolder.isAutoCommit()) {
+          connectionHolder.getSession().commit(true);
         }
         return result;
       } catch (Throwable t) {
         Throwable unwrapped = ExceptionUtil.unwrapThrowable(t);
         if (unwrapped instanceof PersistenceException) {
-          // release the connection to avoid a deadlock if the translator is no loaded. See issue #22
-          sqlSession = null;
+          connectionHolder.setSession(null);
         }
         throw unwrapped;
       } finally {
-        if (sqlSession != null) {
-          // closeSqlSession(sqlSession, SqlSessionTemplate.this.sqlSessionFactory);
+        if (connectionHolder != null) {
+          connectionHolder.release();
         }
       }
     }

@@ -12,17 +12,23 @@ import org.slf4j.LoggerFactory;
  * @author lee.
  */
 public class ConnectionHolder {
+
   private static final Logger logger = LoggerFactory.getLogger(ConnectionHolder.class);
 
   private boolean isDirty;
 
   private SqlSession session;
 
+  private int reference;
+
+  private boolean autoCommit;
+
   public ConnectionHolder() {
   }
 
-  public ConnectionHolder(SqlSession session) {
+  public ConnectionHolder(SqlSession session, boolean autoCommit) {
     this.session = session;
+    this.autoCommit = autoCommit;
   }
 
   public boolean isDirty() {
@@ -34,12 +40,42 @@ public class ConnectionHolder {
   }
 
   public SqlSession getSession() {
-    logger.info("session : " + session);
     return session;
   }
 
   public void setSession(SqlSession session) {
     this.session = session;
+  }
+
+  public void release() {
+    reference--;
+    logger.info("release : " + reference);
+  }
+
+  public SqlSession acquired() {
+    reference++;
+    return session;
+  }
+
+  public void close() {
+    if (reference == 0) {
+      session.close();
+    }
+  }
+
+  /**
+   * @return the autoCommit
+   */
+  public boolean isAutoCommit() {
+    return autoCommit;
+  }
+
+  /**
+   * @param autoCommit
+   *          the autoCommit to set
+   */
+  public void setAutoCommit(boolean autoCommit) {
+    this.autoCommit = autoCommit;
   }
 
 }
