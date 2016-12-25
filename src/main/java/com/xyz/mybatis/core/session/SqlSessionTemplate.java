@@ -17,6 +17,7 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.slf4j.Logger;
 
 public class SqlSessionTemplate implements SqlSession {
 
@@ -202,6 +203,7 @@ public class SqlSessionTemplate implements SqlSession {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
       SqlSession sqlSession = SessionFactoryBean.getSessionLocal().get().getSession();
+      System.out.println("invoke sqlSession : " + sqlSession);
       try {
         Object result = method.invoke(sqlSession, args);
         boolean isSqlSessionTransactional = false;

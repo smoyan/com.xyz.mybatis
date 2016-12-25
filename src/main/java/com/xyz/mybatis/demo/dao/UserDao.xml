@@ -33,6 +33,7 @@
 
   <update id="update" parameterType="User">
     update app_user b set b.age = b.age+1
+    where b.id = #{id}
   </update>
 
 </mapper>

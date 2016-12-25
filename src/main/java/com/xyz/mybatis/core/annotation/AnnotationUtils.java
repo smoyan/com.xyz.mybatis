@@ -11,15 +11,14 @@ import java.lang.reflect.Method;
  */
 public class AnnotationUtils {
 
-  public static Transactional getTransactionalAnnotation(Object object, Method method) {
+  public static Transactional getTransactionalAnnotation(Object object, Method method) throws NoSuchMethodException, SecurityException {
     Transactional annotation = object.getClass().getAnnotation(Transactional.class);
     if (annotation == null) {
-      try {
-        method = object.getClass().getMethod(method.getName(), method.getParameterTypes());
-      } catch (Exception err) {
-        err.printStackTrace();
-      }
       annotation = method.getAnnotation(Transactional.class);
+      if (annotation == null) {
+        method = object.getClass().getMethod(method.getName(), method.getParameterTypes());
+        annotation = method.getAnnotation(Transactional.class);
+      }
     }
     return annotation;
   }

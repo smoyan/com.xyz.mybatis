@@ -5,11 +5,14 @@
 package com.xyz.mybatis.core.session;
 
 import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author lee.
  */
 public class ConnectionHolder {
+  private static final Logger logger = LoggerFactory.getLogger(ConnectionHolder.class);
 
   private boolean isDirty;
 
@@ -31,7 +34,7 @@ public class ConnectionHolder {
   }
 
   public SqlSession getSession() {
-    System.out.println("session : " + session);
+    logger.info("session : " + session);
     return session;
   }
 

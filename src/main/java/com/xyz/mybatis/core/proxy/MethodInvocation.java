@@ -4,13 +4,16 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.xyz.mybatis.core.annotation.AnnotationUtils;
 import com.xyz.mybatis.core.annotation.Transactional;
 import com.xyz.mybatis.core.session.ConnectionHolder;
 import com.xyz.mybatis.core.session.SessionFactoryBean;
 
 public class MethodInvocation<T> implements InvocationHandler {
-
+  private static final Logger logger = LoggerFactory.getLogger(MethodInvocation.class);
   private T target;
   private ConnectionHolder conHolder;
   private boolean isInTransactional;
@@ -33,7 +36,7 @@ public class MethodInvocation<T> implements InvocationHandler {
    * 
    */
   private void beforeInvoke(Method method) throws NoSuchMethodException, SecurityException {
-    System.out.println("before method : " + method.getName());
+    logger.info("before invoke method : " + method.getName());
     Transactional transactional = AnnotationUtils.getTransactionalAnnotation(target, method);
     boolean isAutoCommit = true;
     if (transactional != null) {
@@ -47,14 +50,13 @@ public class MethodInvocation<T> implements InvocationHandler {
    * 
    */
   private void afterInvoke(Method method) {
-    System.out.println("after method : " + method.getName());
     if (isInTransactional) {
-      System.out.println("commit transaction ");
       conHolder.getSession().commit(true);
       conHolder.setDirty(true);
       conHolder.getSession().close();
       SessionFactoryBean.getSessionLocal().remove();
     }
+    logger.info("after invoke method : " + method.getName());
   }
 
   @SuppressWarnings("unchecked")

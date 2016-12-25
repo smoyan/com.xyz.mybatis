@@ -28,7 +28,7 @@ public class SessionFactoryBean {
   private static final String basepackage = "com.xyz.mybatis.demo.dao";
   private static final ConcurrentHashMap<Class<?>, Object> repositories = new ConcurrentHashMap<>();
 
-  private static final ThreadLocal<ConnectionHolder> sessionLocal = new ThreadLocal<ConnectionHolder>();
+  private static ThreadLocal<ConnectionHolder> sessionLocal = new ThreadLocal<ConnectionHolder>();
 
   static {
     getSqlSessionFactory();
