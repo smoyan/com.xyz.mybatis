@@ -17,8 +17,12 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SqlSessionTemplate implements SqlSession {
+
+  private final Logger logger;
 
   private final SqlSessionFactory sqlSessionFactory;
 
@@ -33,8 +37,9 @@ public class SqlSessionTemplate implements SqlSession {
   public SqlSessionTemplate(SqlSessionFactory sqlSessionFactory, ExecutorType executorType) {
     this.sqlSessionFactory = sqlSessionFactory;
     this.executorType = executorType;
-    this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(SqlSessionFactory.class.getClassLoader(),
-        new Class[] { SqlSession.class }, new SqlSessionInterceptor());
+    this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(SqlSessionFactory.class.getClassLoader(), new Class[] { SqlSession.class },
+        new SqlSessionInterceptor());
+    logger = LoggerFactory.getLogger(sqlSessionProxy.getClass());
   }
 
   public SqlSessionFactory getSqlSessionFactory() {
@@ -203,6 +208,12 @@ public class SqlSessionTemplate implements SqlSession {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
       ConnectionHolder connectionHolder = SessionFactoryBean.getSessionLocal().get();
       connectionHolder.acquired();
+      if (connectionHolder.isAutoCommit() && method.getName().startsWith("select")) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("route to slave : " + method.getName());
+        }
+        connectionHolder.getSession().getConnection().setReadOnly(true);
+      }
       try {
         Object result = method.invoke(connectionHolder.getSession(), args);
         if (connectionHolder.isAutoCommit()) {
@@ -217,6 +228,7 @@ public class SqlSessionTemplate implements SqlSession {
         throw unwrapped;
       } finally {
         if (connectionHolder != null) {
+          connectionHolder.getSession().getConnection().setReadOnly(false);
           connectionHolder.release();
         }
       }

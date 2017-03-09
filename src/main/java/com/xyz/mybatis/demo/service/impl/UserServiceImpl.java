@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(isReadOnly = false)
-  public int update(User user) {
+  public boolean update(User user) {
     addressDao.update(null);
     return userDao.update(user);
   }

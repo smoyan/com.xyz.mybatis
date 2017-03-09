@@ -17,7 +17,7 @@ public interface UserService {
 
   public List<User> loadAll();
 
-  public int update(User user);
+  public boolean update(User user);
 
   public List<User> select();
 

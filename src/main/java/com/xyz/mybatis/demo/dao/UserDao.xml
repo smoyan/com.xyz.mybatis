@@ -9,7 +9,7 @@
     <result column="age" property="age" />
     <collection property="addresses" ofType="Address">
       <id column="aid" property="id" />
-      <result column="address" property="address" />
+      <result column="name" property="name" />
       <result column="count" property="count" />
       <result column="user_id" property="userId" />
     </collection>
@@ -18,7 +18,7 @@
   <select id="load" resultMap="userMap">
     select b.*,
     c.id aid,
-    c.address,
+    c.name,
     c.count,
     c.user_id
     from app_user b

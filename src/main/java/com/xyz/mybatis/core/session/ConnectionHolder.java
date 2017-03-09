@@ -4,16 +4,16 @@
 
 package com.xyz.mybatis.core.session;
 
+import java.sql.SQLException;
+
 import org.apache.ibatis.session.SqlSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author lee.
  */
 public class ConnectionHolder {
 
-  private static final Logger logger = LoggerFactory.getLogger(ConnectionHolder.class);
+  // private static final Logger logger = LoggerFactory.getLogger(ConnectionHolder.class);
 
   private boolean isDirty;
 
@@ -47,12 +47,12 @@ public class ConnectionHolder {
     this.session = session;
   }
 
-  public void release() {
+  public void release() throws SQLException {
     reference--;
-    logger.info("release : " + reference);
+    // logger.info("release : " + reference);
   }
 
-  public SqlSession acquired() {
+  public SqlSession acquired() throws SQLException {
     reference++;
     return session;
   }
@@ -71,8 +71,7 @@ public class ConnectionHolder {
   }
 
   /**
-   * @param autoCommit
-   *          the autoCommit to set
+   * @param autoCommit the autoCommit to set
    */
   public void setAutoCommit(boolean autoCommit) {
     this.autoCommit = autoCommit;

@@ -26,7 +26,7 @@ public class UserServiceImplTest {
   @Test
   public void test() throws InterruptedException {
     long start = System.currentTimeMillis();
-    int threadNum = 20;
+    int threadNum = 200;
 
     final CountDownLatch countDownLatch = new CountDownLatch(threadNum);
     final CyclicBarrier barrier = new CyclicBarrier(threadNum);
@@ -37,6 +37,8 @@ public class UserServiceImplTest {
 
     countDownLatch.await();
     System.out.println("耗时(ms):" + (System.currentTimeMillis() - start));
+    System.out.println("现在开始休眠");
+    Thread.sleep(Integer.MAX_VALUE);
   }
 
   private final class TaskThread extends Thread {
@@ -68,11 +70,14 @@ public class UserServiceImplTest {
      */
     private void doRun() throws Exception {
       logger.info(getName() + "开始执行");
-      int id = 1;
-      User user = userService.load(id);
-      user.setAge(user.getAge() + 1);
-      userService.update(user);
-      user = userService.load(id);
+      User user = null;
+      for (int i = 0; i < 10; i++) {
+        int id = 3;
+        user = userService.load(id);
+        user.setAge(user.getAge() + 1);
+        userService.update(user);
+        user = userService.load(id);
+      }
       logger.info(getName() + "第" + num + "次执行完毕, user : " + user);
     }
   }

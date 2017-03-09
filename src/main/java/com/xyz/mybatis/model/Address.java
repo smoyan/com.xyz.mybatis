@@ -10,7 +10,7 @@ package com.xyz.mybatis.model;
 public class Address {
 
   private int id;
-  private String address;
+  private String name;
   private int count;
 
   private int userId;
@@ -23,12 +23,12 @@ public class Address {
     this.id = id;
   }
 
-  public String getAddress() {
-    return address;
+  public String getName() {
+    return name;
   }
 
-  public void setAddress(String address) {
-    this.address = address;
+  public void setName(String name) {
+    this.name = name;
   }
 
   public int getCount() {
@@ -47,8 +47,7 @@ public class Address {
   }
 
   /**
-   * @param userId
-   *          the userId to set
+   * @param userId the userId to set
    */
   public void setUserId(int userId) {
     this.userId = userId;
@@ -56,12 +55,11 @@ public class Address {
 
   /*
    * (non-Javadoc)
-   * 
    * @see java.lang.Object#toString()
    */
   @Override
   public String toString() {
-    return "Address [id=" + id + ", address=" + address + ", count=" + count + ", userId=" + userId + "]";
+    return "Address [id=" + id + ", name=" + name + ", count=" + count + ", userId=" + userId + "]";
   }
 
 }
