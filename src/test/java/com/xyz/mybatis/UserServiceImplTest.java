@@ -21,7 +21,7 @@ import com.xyz.mybatis.model.User;
  */
 public class UserServiceImplTest {
   private static final Logger logger = LoggerFactory.getLogger(UserServiceImplTest.class);
-  UserService userService = ProxyFactory.createProxy(UserServiceImpl.class);
+  UserService userService = ProxyFactory.getProxy(UserServiceImpl.class);
 
   @Test
   public void test() throws InterruptedException {
