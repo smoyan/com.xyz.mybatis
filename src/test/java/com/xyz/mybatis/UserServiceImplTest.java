@@ -26,7 +26,7 @@ public class UserServiceImplTest {
   @Test
   public void test() throws InterruptedException {
     long start = System.currentTimeMillis();
-    int threadNum = 200;
+    int threadNum = 2;
 
     final CountDownLatch countDownLatch = new CountDownLatch(threadNum);
     final CyclicBarrier barrier = new CyclicBarrier(threadNum);
