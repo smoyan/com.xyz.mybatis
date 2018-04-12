@@ -13,11 +13,11 @@ import com.xyz.mybatis.model.User;
  * @author lee.
  */
 @Repository
-public interface UserDao {
+public interface UserDao{
 
   public User load(int id);
 
   public List<User> loadAll();
 
-  public int update(User user);
+  public boolean update(User user);
 }

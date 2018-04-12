@@ -4,10 +4,10 @@
 
 package com.xyz.mybatis.demo.dao;
 
+import java.util.List;
+
 import com.xyz.mybatis.core.annotation.Repository;
 import com.xyz.mybatis.model.Address;
-
-import java.util.List;
 
 /**
  * @author lee.
@@ -16,6 +16,6 @@ import java.util.List;
 public interface AddressDao {
 
   public List<Address> load();
-  
-  public int update(Address address);
+
+  public boolean update(Address address);
 }

@@ -17,7 +17,7 @@ public class ProxyFactory {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T createProxy(Class<T> type) {
+  public static <T> T getProxy(Class<T> type) {
     T target = null;
     try {
       Object existTarget = services.get(type.getName());

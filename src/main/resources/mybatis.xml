@@ -22,7 +22,9 @@
         <property name="username" value="${jdbc.username}" />
         <property name="password" value="${jdbc.passwd}" />
         <property name="initialSize" value="${jdbc.initialSize}"/>
-        <property name="minIdle" value="${jdbc.initialSize}"/>
+        <property name="minIdle" value="${jdbc.minIdle}"/>
+        <property name="maxIdle" value="${jdbc.maxIdle}"/>
+        <property name="maxTotal" value="${jdbc.maxTotal}"/>
       </dataSource>
     </environment>
   </environments>
