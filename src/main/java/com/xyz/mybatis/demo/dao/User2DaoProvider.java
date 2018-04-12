@@ -10,7 +10,7 @@ package com.xyz.mybatis.demo.dao;
 public class User2DaoProvider {
 
   public String select() {
-    return "select * from t_user";
+    return "select * from app_user";
   }
 
 }

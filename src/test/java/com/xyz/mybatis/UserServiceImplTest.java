@@ -26,7 +26,7 @@ public class UserServiceImplTest {
   @Test
   public void test() throws InterruptedException {
     long start = System.currentTimeMillis();
-    int threadNum = 20;
+    int threadNum = 1000;
 
     final CountDownLatch countDownLatch = new CountDownLatch(threadNum);
     final CyclicBarrier barrier = new CyclicBarrier(threadNum);
@@ -68,12 +68,15 @@ public class UserServiceImplTest {
      */
     private void doRun() throws Exception {
       logger.info(getName() + "开始执行");
-      int id = 1;
-      User user = userService.load(id);
-      user.setAge(user.getAge() + 1);
-      userService.update(user);
-      user = userService.load(id);
-      logger.info(getName() + "第" + num + "次执行完毕, user : " + user);
+      int a = 0;
+      while (a++ < 100) {
+        int id = 1;
+        User user = userService.load(id);
+        user.setAge(user.getAge() + 1);
+        userService.update(user);
+        user = userService.load(id);
+      }
+      logger.info(getName() + "第" + num + "次执行完毕, user : ");
     }
   }
 

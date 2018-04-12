@@ -33,8 +33,8 @@ public class SqlSessionTemplate implements SqlSession {
   public SqlSessionTemplate(SqlSessionFactory sqlSessionFactory, ExecutorType executorType) {
     this.sqlSessionFactory = sqlSessionFactory;
     this.executorType = executorType;
-    this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(SqlSessionFactory.class.getClassLoader(),
-        new Class[] { SqlSession.class }, new SqlSessionInterceptor());
+    this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(SqlSessionFactory.class.getClassLoader(), new Class[]
+      { SqlSession.class }, new SqlSessionInterceptor());
   }
 
   public SqlSessionFactory getSqlSessionFactory() {
@@ -201,24 +201,14 @@ public class SqlSessionTemplate implements SqlSession {
   private class SqlSessionInterceptor implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-      ConnectionHolder connectionHolder = SessionFactoryBean.getSessionLocal().get();
-      connectionHolder.acquired();
+      ConnectionHolder connectionHolder = SessionFactoryBean.getInstance().getSessionLocal().get();
       try {
-        Object result = method.invoke(connectionHolder.getSession(), args);
-        if (connectionHolder.isAutoCommit()) {
-          connectionHolder.getSession().commit(true);
-        }
-        return result;
+        return method.invoke(connectionHolder.getSession(), args);
       } catch (Throwable t) {
         Throwable unwrapped = ExceptionUtil.unwrapThrowable(t);
         if (unwrapped instanceof PersistenceException) {
-          connectionHolder.setSession(null);
         }
         throw unwrapped;
-      } finally {
-        if (connectionHolder != null) {
-          connectionHolder.release();
-        }
       }
     }
   }

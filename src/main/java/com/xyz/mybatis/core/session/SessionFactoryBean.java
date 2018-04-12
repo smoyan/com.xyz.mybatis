@@ -29,11 +29,10 @@ public class SessionFactoryBean {
   private static final ConcurrentHashMap<Class<?>, Object> repositories = new ConcurrentHashMap<>();
   private static final SessionFactoryBean intance = new SessionFactoryBean();
 
-  private static ThreadLocal<ConnectionHolder> sessionLocal;
+  private static ThreadLocal<ConnectionHolder> sessionLocal = new ThreadLocal<ConnectionHolder>();;
 
   public SessionFactoryBean() {
     getSqlSessionFactory();
-    sessionLocal = new ThreadLocal<ConnectionHolder>();
   }
 
   public SqlSessionFactory getSqlSessionFactory() {
@@ -74,21 +73,16 @@ public class SessionFactoryBean {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> T getMapper(Class<T> type) {
+  public <T> T getMapper(Class<T> type) {
     return (T) repositories.get(type);
   }
 
-  public static ThreadLocal<ConnectionHolder> getSessionLocal() {
-    return getSessionLocal(true);
+  public ThreadLocal<ConnectionHolder> getSessionLocal() {
+    return sessionLocal;
   }
 
-  public static ThreadLocal<ConnectionHolder> getSessionLocal(boolean autoCommit) {
-    if (null == sessionLocal.get()) {
-      sessionLocal.set(new ConnectionHolder(getInstance().getSqlSessionFactory().openSession(autoCommit), autoCommit));
-    } else if (sessionLocal.get().getSession() == null) {
-      sessionLocal.get().setSession(getInstance().getSqlSessionFactory().openSession(autoCommit));
-    }
-    return sessionLocal;
+  public ConnectionHolder create(boolean autoCommit) {
+    return new ConnectionHolder(getInstance().getSqlSessionFactory().openSession(autoCommit), autoCommit);
   }
 
   public static SessionFactoryBean getInstance() {

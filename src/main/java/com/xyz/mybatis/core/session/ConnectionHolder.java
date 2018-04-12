@@ -49,11 +49,12 @@ public class ConnectionHolder {
 
   public void release() {
     reference--;
-    logger.info("release : " + reference);
+    logger.info(Thread.currentThread().getName() + "-释放连接, reference : " + reference);
   }
 
   public SqlSession acquired() {
     reference++;
+    logger.info(Thread.currentThread().getName() + "-获取连接, reference : " + reference);
     return session;
   }
 
@@ -70,9 +71,12 @@ public class ConnectionHolder {
     return autoCommit;
   }
 
+  public boolean isOpen() {
+    return reference > 0;
+  }
+
   /**
-   * @param autoCommit
-   *          the autoCommit to set
+   * @param autoCommit the autoCommit to set
    */
   public void setAutoCommit(boolean autoCommit) {
     this.autoCommit = autoCommit;
